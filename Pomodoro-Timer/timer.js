@@ -10,12 +10,14 @@ var selectTime = document.getElementById("timer-options");
 function set_state(newState){
     state = newState;
     if (newState == 'intervalo'){
+        state = "intervalo";
         minutos = 15;
         segundos = 0;
     }
 }
 
-function setTime(){
+function setTime(state){
+    console.log(state);
     switch (state){
         case 'focus':
             segundos++
@@ -24,6 +26,8 @@ function setTime(){
                 minutos++
             }
             if(minutos == 25){
+                clearInterval(timer)
+                timer = setInterval(setTime, 1000, "intervalo")
                 set_state("intervalo")
             }
             break
@@ -33,18 +37,24 @@ function setTime(){
                 minutos--;
             }
             segundos--
-    }
-
-
-
+        }
     display.textContent = ((minutos < 10 ? "0" : "") + minutos + ":" + (segundos < 10 ? "0" : "") + segundos)
 }
+
+
 function start(){ 
-    if(state != "focus"){
-        timer = setInterval(setTime, 1000);
+    if(state == "paused"){
+        timer = setInterval(setTime, 1000, "focus");
+        state = "focus"
     }
-    set_state("focus");
+
+    if (state == "paused_inter"){
+        timer = setInterval(setTime, 1000, "intervalo");
+        state = "intervalo"
+    }
 }
+
+
 function reset(){
     segundos = 0
     minutos = 0
@@ -52,8 +62,15 @@ function reset(){
     clearInterval(timer)
     set_state("paused");
 }
-function pause(){
-    clearInterval(timer)
-    set_state("paused");
 
+
+function pause(){
+    if (state == "focus"){
+        clearInterval(timer);
+        state = "paused";
+    }
+    if (state == "intervalo"){
+        clearInterval(timer)
+        state = "paused_inter"
+    }
 }
