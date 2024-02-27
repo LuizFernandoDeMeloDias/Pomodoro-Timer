@@ -10,13 +10,31 @@
 </head>
 <body>
     <div class="text-bg-dark p-3 full-screen">
-    <div id="timer-select">
-        <div id="title">
-            Pomodoro-Timer
-        </div>
-    </div>
+        <div class="container text-center">
+            <div class="row">
+                
+                <div class="col-4" id="all-timer-options">
 
-    <div id="display">00:00</div>
+                    <select id="timer-options">
+                        <option value="1">15min</option>
+                        <option value="2">5min</option>
+                        <option value="3">3min</option>
+                    </select>
+                 </div>
+
+                <div class="col-8">
+                    
+                    <div id="title">
+                        Pomodoro-Timer
+                    </div>
+                </div>
+
+            </div>
+                <div id="display">
+                    00:00
+                </div>
+            
+        </div>
 
     <div id="button-timer">
         <button type="button" class="btn btn-outline-danger" onclick="start()">Start</button>
