@@ -1,57 +1,100 @@
+var segundos = 10;
 
-var segundos = 55;
-var minutos = 24;
-var state = "paused";
+var minutos = 0;
+
+const ESTADO = {
+    FOCO: "foco",
+    PAUSADO: "pausado",
+    INTERVALO: "intervalo",
+    PAUSADO_INTERVALO: "pausado_intervalo",
+}
+
+let estado = ESTADO.PAUSADO_INTERVALO 
 
 var display = document.getElementById("display");
 
-var selectTime = document.getElementById("timer-options");
+var show_state = document.getElementById("show-state");
 
-function set_state(newState){
-    state = newState;
-    if (newState == 'intervalo'){
-        state = "intervalo";
-        minutos = 15;
-        segundos = 0;
+var intervalTimer = 0;
+
+
+function tempoDeIntervalo(){
+
+    let optionValue = document.getElementById("timer-options").value;
+    console.log(optionValue);
+    switch (optionValue){
+        case "1":
+            intervalTimer = 15;
+            break
+        case "2":
+            intervalTimer = 5;
+            break
+        case "3":
+            intervalTimer = 3;
+            break
+    }
+    return intervalTimer;
+
+}
+
+function setTimer(estado){
+    switch(estado){
+        
+        case ESTADO.FOCO:
+            segundos = 0;
+            minutos = 0;
+        break
+        case ESTADO.INTERVALO:
+            segundos = 0;
+            minutos = tempoDeIntervalo();
+        break
     }
 }
 
-function setTime(state){
-    console.log(state);
-    switch (state){
-        case 'focus':
-            segundos++
-            if(segundos >= 60){
-                segundos = 0
-                minutos++
+
+
+function updateTime() {
+    switch (estado) {
+        case ESTADO.FOCO:
+            segundos++;
+            if (segundos >= 60) {
+                segundos = 0;
+                minutos++;
             }
-            if(minutos == 25){
-                clearInterval(timer)
-                timer = setInterval(setTime, 1000, "intervalo")
-                set_state("intervalo")
+            if (minutos === 25) {
+                clearInterval(timer);
+                estado = ESTADO.INTERVALO;
+                setTimer(estado);
+                timer = setInterval(updateTime, 1000);
             }
-            break
-        case 'intervalo':
-            if(segundos == 0){
+            break;
+        case ESTADO.INTERVALO:
+            if (segundos === 0) {
                 segundos = 60;
                 minutos--;
             }
-            segundos--
-        }
-    display.textContent = ((minutos < 10 ? "0" : "") + minutos + ":" + (segundos < 10 ? "0" : "") + segundos)
+            segundos--;
+            if (minutos === 0 && segundos === 0) {
+                clearInterval(timer);
+                estado = ESTADO.PAUSADO;
+                display.textContent = "00:00";
+            }
+            break;
+    }
+    display.textContent = ((minutos < 10 ? "0" : "") + minutos + ":" + (segundos < 10 ? "0" : "") + segundos);
 }
 
-
-function start(){ 
-    if(state == "paused"){
-        timer = setInterval(setTime, 1000, "focus");
-        state = "focus"
+function iniciar(){ 
+    if(estado === ESTADO.PAUSADO){
+        estado = ESTADO.FOCO;
+        timer = setInterval(updateTime, 1000, ESTADO.FOCO);
     }
 
-    if (state == "paused_inter"){
-        timer = setInterval(setTime, 1000, "intervalo");
-        state = "intervalo"
+    if (estado === ESTADO.PAUSADO_INTERVALO){
+        estado = ESTADO.INTERVALO
+        timer = setInterval(updateTime, 1000, ESTADO.INTERVALO);
     }
+    
 }
 
 
@@ -64,13 +107,15 @@ function reset(){
 }
 
 
-function pause(){
-    if (state == "focus"){
+function pausar(){
+    if (estado === ESTADO.FOCO){
         clearInterval(timer);
-        state = "paused";
+        estado = ESTADO.PAUSADO
     }
-    if (state == "intervalo"){
-        clearInterval(timer)
-        state = "paused_inter"
+    if (estado === ESTADO.INTERVALO){
+        clearInterval(timer);
+        estado = ESTADO.PAUSADO_INTERVALO
     }
 }
+
+
